@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pre-Viaje — IntraCargo Logística</title>
+<style>
+/* ─── SISTEMA DE DISEÑO INTRACARGO ─────────────────────────────
+   Colores: Azul #1B9BD8 · Negro #0F1923 · Blanco #FFFFFF
+   Tipografía: system sans-serif (proximidad a la marca)
+   Usar este encabezado en TODOS los checklist y plataformas
+──────────────────────────────────────────────────────────────── */
+:root{
+  --ic-azul:    #1B9BD8;
+  --ic-azul-dk: #1480B8;
+  --ic-negro:   #0F1923;
+  --ic-gris1:   #f0f0ee;
+  --ic-gris2:   #e0dfda;
+  --ic-gris3:   #b4b2a9;
+  --ic-gris4:   #5f5e5a;
+  --ic-verde:   #3b6d11;
+  --ic-rojo:    #a32d2d;
+  --ic-naranja: #854f0b;
+  --radius:     10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--ic-gris1);color:var(--ic-negro);min-height:100vh;font-size:14px}
+
+/* ─── HEADER OFICIAL INTRACARGO ────────────────────────────── */
+.ic-header{
+  background:var(--ic-negro);
+  padding:0 16px;
+  height:56px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  position:sticky;
+  top:0;
+  z-index:100;
+  border-bottom:2px solid var(--ic-azul);
+}
+.ic-logo{display:flex;align-items:center;gap:0;flex:1;text-decoration:none}
+.ic-logo-svg{width:34px;height:34px;flex-shrink:0}
+.ic-wordmark{display:flex;flex-direction:column;line-height:1}
+.ic-wordmark-main{font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.3px}
+.ic-wordmark-main span{color:var(--ic-azul)}
+.ic-wordmark-sub{font-size:8px;font-weight:400;color:var(--ic-gris3);letter-spacing:3px;text-transform:uppercase;margin-top:1px}
+.ic-header-badge{font-size:10px;font-weight:600;color:var(--ic-gris3);font-family:monospace;white-space:nowrap}
+
+/* ─── TABS ──────────────────────────────────────────────────── */
+.ic-tabs{background:#fff;border-bottom:1px solid var(--ic-gris2);padding:0 12px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;display:flex}
+.ic-tabs::-webkit-scrollbar{display:none}
+.ic-tab{display:inline-flex;align-items:center;gap:6px;padding:13px 14px;font-size:13px;font-weight:500;color:var(--ic-gris4);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.ic-tab.active{color:var(--ic-azul);border-bottom-color:var(--ic-azul)}
+.ic-tab-dot{width:7px;height:7px;border-radius:50%;background:var(--ic-gris2);flex-shrink:0;transition:background .15s}
+.ic-tab.active .ic-tab-dot{background:var(--ic-azul)}
+
+/* ─── DATOS DEL VIAJE ──────────────────────────────────────── */
+.ic-card{background:#fff;margin:12px;border-radius:var(--radius);border:1px solid var(--ic-gris2);overflow:hidden}
+.ic-card-head{padding:10px 14px;background:var(--ic-gris1);border-bottom:1px solid var(--ic-gris2);display:flex;align-items:center;gap:8px}
+.ic-card-head span{font-size:12px;font-weight:600;color:var(--ic-gris4);text-transform:uppercase;letter-spacing:.5px}
+.ic-fields{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ic-field label{font-size:11px;color:var(--ic-gris4);display:block;margin-bottom:4px;font-weight:500}
+.ic-field input,.ic-field select{width:100%;border:1px solid var(--ic-gris2);border-radius:7px;padding:9px 11px;font-size:13px;color:var(--ic-negro);background:#fff;-webkit-appearance:none;appearance:none;transition:border .15s}
+.ic-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235f5e5a' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px}
+.ic-field input:focus,.ic-field select:focus{outline:none;border-color:var(--ic-azul)}
+.ic-field.full{grid-column:1/-1}
+
+/* ─── PROGRESO ──────────────────────────────────────────────── */
+.ic-prog{margin:4px 12px 12px;display:flex;align-items:center;gap:10px}
+.ic-prog-bar{flex:1;background:var(--ic-gris2);border-radius:8px;height:5px;overflow:hidden}
+.ic-prog-fill{height:100%;border-radius:8px;background:var(--ic-azul);transition:width .3s}
+.ic-prog-fill.done{background:var(--ic-verde)}
+.ic-prog-label{font-size:12px;color:var(--ic-gris4);min-width:44px;text-align:right;font-weight:600}
+
+/* ─── BANNERS ───────────────────────────────────────────────── */
+.ic-banner{margin:0 12px 8px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;display:none;line-height:1.4}
+.ic-banner-blk{background:#fef2f2;border:1px solid #fca5a5;color:var(--ic-rojo)}
+.ic-banner-ok{background:#f0fdf4;border:1px solid #86efac;color:var(--ic-verde)}
+
+/* ─── SECCIONES CHECKLIST ──────────────────────────────────── */
+.ic-section{background:#fff;margin:0 12px 8px;border-radius:var(--radius);border:1px solid var(--ic-gris2);overflow:hidden}
+.ic-sec-head{display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--ic-gris1);border-bottom:1px solid var(--ic-gris2)}
+.ic-sec-icon{width:15px;height:15px;flex-shrink:0;color:var(--ic-gris4)}
+.ic-sec-title{font-size:12px;font-weight:700;flex:1;color:var(--ic-negro);text-transform:uppercase;letter-spacing:.4px}
+.ic-sec-count{font-size:11px;color:var(--ic-gris4);font-weight:600}
+
+.ic-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid #f5f5f3;cursor:pointer;transition:background .1s;user-select:none;-webkit-user-select:none}
+.ic-item:last-child{border-bottom:none}
+.ic-item:active{background:var(--ic-gris1)}
+.ic-item.excl{border-left:3px solid #f59e0b;background:#fffdf7}
+.ic-item.excl:active{background:#fffbee}
+
+.ic-cb{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--ic-gris2);flex-shrink:0;margin-top:0;display:flex;align-items:center;justify-content:center;transition:all .2s;color:#fff;font-size:13px;font-weight:700}
+.ic-item.checked .ic-cb{background:var(--ic-verde);border-color:var(--ic-verde)}
+.ic-item.checked .ic-item-text{color:var(--ic-gris3);text-decoration:line-through}
+
+.ic-item-text{font-size:13px;color:var(--ic-negro);line-height:1.45;transition:color .2s}
+.ic-item-sub{font-size:11px;color:var(--ic-gris4);margin-top:2px;line-height:1.4}
+
+.ic-badge-blk{font-size:9px;font-weight:700;background:#fee2e2;color:var(--ic-rojo);border:1px solid #fca5a5;border-radius:4px;padding:1px 5px;margin-left:5px;white-space:nowrap;display:inline-block;vertical-align:middle;letter-spacing:.3px}
+.ic-badge-excl{font-size:9px;font-weight:600;background:#fef3c7;color:var(--ic-naranja);border:1px solid #fcd34d;border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap;display:inline-block;vertical-align:middle}
+
+/* ─── OBSERVACIONES ─────────────────────────────────────────── */
+.ic-obs{margin:0 12px 8px}
+.ic-obs label{font-size:11px;font-weight:600;color:var(--ic-gris4);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.ic-obs textarea{width:100%;border:1px solid var(--ic-gris2);border-radius:var(--radius);padding:11px;font-size:13px;color:var(--ic-negro);background:#fff;resize:none;height:76px;font-family:inherit}
+.ic-obs textarea:focus{outline:none;border-color:var(--ic-azul)}
+
+/* ─── BOTONES ───────────────────────────────────────────────── */
+.ic-actions{padding:8px 12px 28px;display:flex;flex-direction:column;gap:8px}
+.ic-btn-primary{width:100%;padding:15px;border-radius:var(--radius);border:none;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.2px}
+.ic-btn-primary.on{background:var(--ic-azul);color:#fff}
+.ic-btn-primary.on:active{background:var(--ic-azul-dk);transform:scale(.98)}
+.ic-btn-primary.off{background:var(--ic-gris2);color:var(--ic-gris3);cursor:not-allowed}
+.ic-btn-reset{width:100%;padding:11px;border-radius:var(--radius);border:1px solid var(--ic-gris2);font-size:13px;font-weight:500;background:#fff;color:var(--ic-gris4);cursor:pointer}
+.ic-btn-reset:active{background:var(--ic-gris1)}
+
+/* ─── TOAST ─────────────────────────────────────────────────── */
+.ic-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ic-negro);color:#fff;padding:12px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;transition:transform .25s;z-index:999;white-space:nowrap;border-bottom:2px solid var(--ic-azul)}
+.ic-toast.show{transform:translateX(-50%) translateY(0)}
+
+.sp{height:12px}
+
+/* ─── ACORDEÓN ──────────────────────────────────────────────── */
+.ic-section{background:#fff;margin:0 12px 8px;border-radius:var(--radius);border:1px solid var(--ic-gris2);overflow:hidden}
+.ic-sec-head{display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--ic-gris1);cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .1s}
+.ic-sec-head:active{background:var(--ic-gris2)}
+.ic-sec-head.open{border-bottom:1px solid var(--ic-gris2)}
+.ic-sec-chevron{margin-left:auto;transition:transform .2s;flex-shrink:0}
+.ic-sec-chevron.open{transform:rotate(180deg)}
+.ic-sec-body{display:none}
+.ic-sec-body.open{display:block}
+.ic-sec-count-wrap{display:flex;align-items:center;gap:6px}
+.ic-sec-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--ic-gris2);color:var(--ic-gris4)}
+.ic-sec-pill.done{background:#dcfce7;color:var(--ic-verde)}
+.ic-sec-pill.has-blk{background:#fee2e2;color:var(--ic-rojo)}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER OFICIAL INTRACARGO ══════════════════════════════ -->
+<header class="ic-header">
+  <div class="ic-logo">
+    <img src="https://drive.google.com/uc?export=view&id=1Iw8U2-KlVNzcelUMOCwkaHJvv9Y16U24" class="ic-logo-svg" alt="IntraCargo Logística" style="height:36px;width:auto;object-fit:contain;">
+
+  </div>
+  <div class="ic-header-badge">SOP-VPC-001</div>
+</header>
+
+<!-- ═══ TABS POR CLIENTE ════════════════════════════════════════ -->
+<div class="ic-tabs" id="tabs"></div>
+
+<div class="sp"></div>
+
+<!-- ═══ DATOS DEL VIAJE ════════════════════════════════════════ -->
+<div class="ic-card">
+  <div class="ic-card-head">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--ic-gris4)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Datos del viaje</span>
+  </div>
+  <div class="ic-fields">
+    <div class="ic-field full">
+      <label>Operador</label>
+      <input type="text" id="f-op" placeholder="Nombre del operador" autocomplete="off">
+    </div>
+    <div class="ic-field">
+      <label>Unidad</label>
+      <select id="f-un">
+        <option value="">— Seleccionar —</option>
+        <option>IC-001</option>
+        <option>IC-002</option>
+        <option>IC-003</option>
+        <option>IC-004</option>
+      </select>
+    </div>
+    <div class="ic-field">
+      <label>Caja</label>
+      <select id="f-cj">
+        <option value="">— Seleccionar —</option>
+        <option>IC-101</option>
+        <option>IC-102</option>
+        <option>IC-103</option>
+        <option>IC-104</option>
+      </select>
+    </div>
+    <div class="ic-field">
+      <label>Origen</label>
+      <select id="f-or">
+        <option value="">— Seleccionar —</option>
+        <option>Toluca</option>
+        <option>Querétaro</option>
+        <option>Lagos de Moreno</option>
+        <option>Cuautitlán</option>
+        <option>Chalco</option>
+        <option>Tultitlán</option>
+        <option>CDMX</option>
+      </select>
+    </div>
+    <div class="ic-field">
+      <label>Destino</label>
+      <select id="f-pl">
+        <option value="">— Seleccionar —</option>
+        <option>Toluca</option>
+        <option>Querétaro</option>
+        <option>Lagos de Moreno</option>
+        <option>Cuautitlán</option>
+        <option>Chalco</option>
+        <option>Tultitlán</option>
+        <option>CDMX</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BARRA DE PROGRESO ════════════════════════════════════════ -->
+<div class="ic-prog">
+  <div class="ic-prog-bar"><div class="ic-prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="ic-prog-label" id="prog-label">0/0</div>
+</div>
+
+<!-- ═══ BANNERS ══════════════════════════════════════════════════ -->
+<div id="blk-banner" class="ic-banner ic-banner-blk"></div>
+<div id="ok-banner"  class="ic-banner ic-banner-ok">✔ Unidad lista — todos los requisitos cubiertos.</div>
+
+<!-- ═══ CHECKLIST ════════════════════════════════════════════════ -->
+<div id="sections"></div>
+
+<!-- ═══ OBSERVACIONES ════════════════════════════════════════════ -->
+<div class="ic-obs">
+  <label>Observaciones</label>
+  <textarea id="f-obs" placeholder="Incidencias, notas o comentarios..."></textarea>
+</div>
+
+<!-- ═══ ACCIONES ═════════════════════════════════════════════════ -->
+<div class="ic-actions">
+  <button class="ic-btn-primary off" id="btn-submit" onclick="submit()">Registrar salida</button>
+  <button class="ic-btn-reset" onclick="resetAll()">↺ Reiniciar checklist</button>
+</div>
+
+<div class="ic-toast" id="toast"></div>
+
+<!-- ═══ LÓGICA ═══════════════════════════════════════════════════ -->
+<script>
+const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSfqN56wIdmZkQs_TTjGnyklmk3cEhrf_c9sR_rs5EmtbNsPMA/formResponse";
+const F = {
+  fecha:       "entry.446689794",
+  hora:        "entry.411141417",
+  operador:    "entry.580200205",
+  unidad:      "entry.1060925175",
+  caja:        "entry.1794199450",
+  cliente:     "entry.669554492",
+  destino:     "entry.1587218266",
+  origen:      "entry.1853879780",
+  requisitos:  "entry.902735953",
+  bloqueantes: "entry.751294100",
+  completo:    "entry.115925045",
+  obs:         "entry.325868306"
+};
+
+const BASE = [
+  {id:'ine',     text:'INE y licencia vigente',             sub:'Copia + original a bordo',                                sec:'Operador',      blk:true},
+  {id:'sua',     text:'SUA vigente',                        sub:'Constancia seguridad social al corriente',                sec:'Operador',      blk:true},
+  {id:'epp',     text:'EPP completo',                       sub:'Casco, botas de seguridad, chaleco reflejante',           sec:'Operador'},
+  {id:'odt',     text:'ODT / Carta de instrucciones impresa',sub:'Datos del viaje y cliente correctos',                   sec:'Documentación', blk:true},
+  {id:'cp',      text:'Carta Porte correcta',               sub:'CFDI complemento validado',                              sec:'Documentación', blk:true},
+  {id:'seg',     text:'Póliza de seguro vigente',           sub:'Verificar vigencia y número',                            sec:'Unidad',        blk:true},
+  {id:'tc_trac', text:'Tarjeta circulación tractocamión',   sub:'Vigente y a bordo',                                      sec:'Unidad',        blk:true},
+  {id:'tc_caja', text:'Tarjeta circulación caja',           sub:'Vigente y a bordo',                                      sec:'Unidad',        blk:true},
+  {id:'gps_trac',text:'GPS tractocamión activo',            sub:'Señal confirmada antes de salir',                       sec:'Unidad',        blk:true},
+  {id:'gps_caja',text:'GPS caja activo',                    sub:'Visibilidad completa del recorrido',                    sec:'Unidad',        blk:true},
+  {id:'llantas', text:'Llantas con vida útil ≥ 3/4"',       sub:'Presión y cocada revisada — 18 neumáticos',            sec:'Unidad'},
+  {id:'luces',   text:'Luces funcionales',                  sub:'Delanteras, traseras, intermitentes y toritos',          sec:'Unidad'},
+  {id:'extintor',text:'Extintor(es) vigentes',              sub:'4 kg (1 pza) ó 2×2 kg',                                  sec:'Unidad'},
+  {id:'alarma',  text:'Alarma de reversa funcional',        sub:'Probar antes de salir',                                  sec:'Unidad'},
+  {id:'diesel',  text:'Tanque lleno de diesel',             sub:'Sin paradas en primeros 300 km',                        sec:'Unidad'},
+  {id:'caja_est',text:'Caja en buen estado',                sub:'Sin filtraciones, golpes ni daños estructurales',        sec:'Caja'},
+  {id:'caja_lim',text:'Caja limpia y sin olores',           sub:'Interior libre de residuos y contaminantes',             sec:'Caja'},
+];
+
+const CLIENTS = {
+  nestle:{
+    label:'Nestlé',
+    planta:'Planta Lerma / CEDIS',
+    sistema:'R-Control / Fasttrack',
+    color:'#1B9BD8',
+    extras:[
+      {id:'fumig', text:'Certificado de fumigación impreso', sub:'Vigente — no se acepta digital en planta',       sec:'Documentación', blk:true,  excl:true},
+      {id:'antig', text:'Caja no mayor a 10 años',           sub:'Verificar año en tarjeta de circulación',        sec:'Caja',          blk:true,  excl:true},
+      {id:'barras',text:'4 a 6 barras de carga',             sub:'Aseguradas en la unidad',                        sec:'Caja',          excl:true},
+      {id:'panico',text:'Botón de pánico activo',            sub:'Verificar funcionamiento antes de salir',        sec:'Seguridad',     blk:true,  excl:true},
+      {id:'ruta',  text:'Ruta por carretera de cuota',       sub:'No libre — confirmar con Dirección Operativa',  sec:'Seguridad',     excl:true},
+    ]
+  },
+  heineken:{
+    label:'Heineken',
+    planta:'Planta / CEDIS asignado',
+    sistema:'Patrimonio externo',
+    color:'#006837',
+    extras:[
+      // Documentación
+      {id:'hk_sua',    text:'SUA vigente + comprobante de pago mes vigente', sub:'Impreso — requerido por Heineken',                         sec:'Documentación', blk:true,  excl:true},
+      {id:'hk_ine',    text:'INE del operador',                              sub:'A bordo',                                                  sec:'Documentación', blk:true,  excl:true},
+      {id:'hk_lic',    text:'Licencia de conducir',                          sub:'Impreso — requerido por Heineken',                         sec:'Documentación', blk:true,  excl:true},
+      {id:'hk_tc',     text:'Tarjeta de circulación',                        sub:'Impreso — requerido por Heineken',                         sec:'Documentación', blk:true,  excl:true},
+      {id:'hk_seg',    text:'Póliza de seguro del vehículo',                 sub:'Impreso — requerido por Heineken',                         sec:'Documentación', blk:true,  excl:true},
+      {id:'hk_cp',     text:'Carta porte timbrada',                          sub:'Aplica en Planta Guadalajara — confirmar si aplica',       sec:'Documentación', blk:false, excl:true},
+      // EPP específico Heineken
+      {id:'hk_casco',  text:'Casco color azul',                              sub:'Color azul específico — no se acepta otro color',          sec:'Operador',      blk:true,  excl:true},
+      {id:'hk_chaleco',text:'Chaleco fluorescente color naranja',            sub:'Color naranja específico',                                 sec:'Operador',      blk:true,  excl:true},
+      {id:'hk_zapatos',text:'Zapatos de seguridad',                          sub:'A bordo antes de ingresar a planta',                       sec:'Operador',      blk:true,  excl:true},
+      {id:'hk_lentes', text:'Lentes de seguridad',                          sub:'A bordo antes de ingresar a planta',                       sec:'Operador',      blk:true,  excl:true},
+      {id:'hk_guantes',text:'Guantes de seguridad',                         sub:'Aplica en OXXO CEDIS — confirmar si aplica',               sec:'Operador',      blk:false, excl:true},
+      // Remolque
+      {id:'hk_bandas', text:'4 bandas o gatas logísticas',                  sub:'Aseguradas en la unidad',                                  sec:'Caja',          blk:true,  excl:true},
+      {id:'hk_caja_hk',text:'Caja sin defectos Heineken',                   sub:'Sin grietas, mal olor, basura, líquidos, plagas, láminas saltadas, clavos, orificios en techo', sec:'Caja', blk:true, excl:true},
+      {id:'hk_fotos',  text:'Fotos y video de la caja antes de posicionar', sub:'Enviar a Dirección Operativa antes de entrar a planta',    sec:'Caja',          blk:true,  excl:true},
+    ]
+  },
+  estandar:{
+    label:'Estándar',
+    planta:'—',
+    sistema:'LIS TMS',
+    color:'#5f5e5a',
+    extras:[]
+  }
+};
+
+const SEC_ORDER = ['Operador','Documentación','Unidad','Caja','Seguridad'];
+const SEC_ICONS = {
+  Operador:`<svg class="ic-sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`,
+  Documentación:`<svg class="ic-sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+  Unidad:`<svg class="ic-sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+  Caja:`<svg class="ic-sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+  Seguridad:`<svg class="ic-sec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`
+};
+
+let cur = 'nestle';
+let state = {};
+
+function allItems(k){ return [...BASE,...(CLIENTS[k].extras||[])]; }
+function initState(k){ if(!state[k]) state[k]={}; allItems(k).forEach(i=>{ if(state[k][i.id]===undefined) state[k][i.id]=false; }); }
+
+function renderTabs(){
+  document.getElementById('tabs').innerHTML = Object.keys(CLIENTS).map(k=>`
+    <div class="ic-tab ${k===cur?'active':''}" onclick="sw('${k}')">
+      <div class="ic-tab-dot"></div>${CLIENTS[k].label}
+    </div>`).join('');
+}
+
+function sw(k){ cur=k; openSecs={}; initState(k); render(); }
+
+function getSections(k){
+  const map={};
+  allItems(k).forEach(i=>{ if(!map[i.sec]) map[i.sec]=[]; map[i.sec].push(i); });
+  return SEC_ORDER.filter(s=>map[s]).map(s=>({name:s,items:map[s]}));
+}
+
+// Guarda qué secciones están abiertas
+let openSecs = {};
+
+function toggleSec(name){
+  openSecs[name] = !openSecs[name];
+  renderSections();
+}
+
+function renderSections(){
+  const secs = getSections(cur);
+  // Abrir automáticamente secciones con bloqueantes pendientes; resto cerradas por defecto
+  secs.forEach(sec=>{
+    if(openSecs[sec.name]===undefined){
+      const hasPendingBlk = sec.items.some(i=>i.blk && !state[cur][i.id]);
+      openSecs[sec.name] = hasPendingBlk;
+    }
+  });
+
+  document.getElementById('sections').innerHTML = secs.map(sec=>{
+    const done  = sec.items.filter(i=>state[cur][i.id]).length;
+    const total = sec.items.length;
+    const hasPendingBlk = sec.items.some(i=>i.blk && !state[cur][i.id]);
+    const isOpen = openSecs[sec.name];
+    const pillClass = done===total ? 'done' : hasPendingBlk ? 'has-blk' : '';
+    const pillLabel = done===total ? '✓ Listo' : hasPendingBlk ? '⚠ Bloq' : done+'/'+total;
+
+    return `<div class="ic-section">
+      <div class="ic-sec-head ${isOpen?'open':''}" onclick="toggleSec('${sec.name}')">
+        ${SEC_ICONS[sec.name]||''}
+        <span class="ic-sec-title">${sec.name}</span>
+        <div class="ic-sec-count-wrap">
+          <span class="ic-sec-pill ${pillClass}">${pillLabel}</span>
+          <svg class="ic-sec-chevron ${isOpen?'open':''}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="ic-sec-body ${isOpen?'open':''}">
+        ${sec.items.map(it=>`
+          <div class="ic-item ${state[cur][it.id]?'checked':''} ${it.excl?'excl':''}" onclick="toggle('${it.id}')">
+            <div class="ic-cb">${state[cur][it.id]?'✓':''}</div>
+            <div style="flex:1">
+              <span class="ic-item-text">${it.text}${it.blk?'<span class="ic-badge-blk">BLOQ</span>':''}${it.excl?'<span class="ic-badge-excl">exclusivo</span>':''}</span>
+              ${it.sub?`<div class="ic-item-sub">${it.sub}</div>`:''}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderProgress(){
+  const all = allItems(cur);
+  const total = all.length;
+  const done = all.filter(i=>state[cur][i.id]).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  const fill = document.getElementById('prog-fill');
+  fill.style.width = pct+'%';
+  fill.className = 'ic-prog-fill'+(done===total?' done':'');
+  document.getElementById('prog-label').textContent = done+'/'+total;
+
+  const pending = all.filter(i=>i.blk && !state[cur][i.id]);
+  const blk = document.getElementById('blk-banner');
+  const ok  = document.getElementById('ok-banner');
+  const btn = document.getElementById('btn-submit');
+
+  if(pending.length){
+    blk.style.display='block';
+    blk.innerHTML='<strong>Bloqueantes pendientes:</strong> '+pending.map(i=>i.text).join(' · ');
+    ok.style.display='none';
+    btn.className='ic-btn-primary off';
+  } else if(done===total){
+    blk.style.display='none';
+    ok.style.display='block';
+    btn.className='ic-btn-primary on';
+  } else {
+    blk.style.display='none';
+    ok.style.display='none';
+    btn.className='ic-btn-primary off';
+  }
+}
+
+function toggle(id){ state[cur][id]=!state[cur][id]; renderSections(); renderProgress(); }
+function resetAll(){
+  state[cur]={}; initState(cur); render();
+  document.getElementById('f-op').value='';
+  document.getElementById('f-un').value='';
+  document.getElementById('f-cj').value='';
+  document.getElementById('f-or').value='';
+  document.getElementById('f-pl').value='';
+  document.getElementById('f-obs').value='';
+  openSecs={};
+}
+function render(){ renderTabs(); renderSections(); renderProgress(); }
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+function submit(){
+  const all = allItems(cur);
+  if(all.filter(i=>i.blk&&!state[cur][i.id]).length){ showToast('Resuelve los bloqueantes primero'); return; }
+
+  const now = new Date();
+  const fecha = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  const hora  = pad(now.getHours())+':'+pad(now.getMinutes());
+
+  const done   = all.filter(i=>state[cur][i.id]).map(i=>i.text);
+  const noDone = all.filter(i=>!state[cur][i.id]).map(i=>i.text);
+  const total  = all.length;
+
+  const op = document.getElementById('f-op').value.trim()||'—';
+  const un = document.getElementById('f-un').value||'—';
+  const cj = document.getElementById('f-cj').value||'—';
+  const or_ = document.getElementById('f-or').value||'—';
+  const pl = document.getElementById('f-pl').value||CLIENTS[cur].planta;
+  const ob = document.getElementById('f-obs').value.trim()||'—';
+
+  const cliente = CLIENTS[cur].label+' — '+CLIENTS[cur].sistema;
+  const requisitos = done.length+'/'+total+' completados: '+done.join(', ');
+  const bloqueantes = noDone.length ? noDone.join(', ') : 'Ninguno';
+
+  const params = new URLSearchParams([
+    [F.fecha,       fecha],
+    [F.hora,        hora],
+    [F.operador,    op],
+    [F.unidad,      un],
+    [F.caja,        cj],
+    [F.cliente,     cliente],
+    [F.origen,      or_],
+    [F.destino,     pl],
+    [F.requisitos,  requisitos],
+    [F.bloqueantes, bloqueantes],
+    [F.completo,    done.length===total?'Si':'No'],
+    [F.obs,         ob]
+  ]);
+
+  const ifr = document.createElement('iframe');
+  ifr.style.display='none'; ifr.name='_ic_submit';
+  document.body.appendChild(ifr);
+  const frm = document.createElement('form');
+  frm.method='POST'; frm.action=FORM_ACTION; frm.target='_ic_submit'; frm.style.display='none';
+  for(const [k,v] of params){ const i=document.createElement('input'); i.type='hidden'; i.name=k; i.value=v; frm.appendChild(i); }
+  document.body.appendChild(frm);
+  frm.submit();
+  setTimeout(()=>{ document.body.removeChild(frm); document.body.removeChild(ifr); },3000);
+
+  showToast('✔ Salida registrada');
+  setTimeout(()=>{ resetAll(); document.getElementById('f-obs').value=''; },1600);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+Object.keys(CLIENTS).forEach(k=>initState(k));
+render();
+</script>
+</body>
+</html>
